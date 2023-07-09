@@ -1,0 +1,22 @@
+.ipynb_checkpoints/
+./ipynb_checkpoints/
+# Project file
+.idea
+.vscode
+.DS_Store
+wandb/
+
+# Test file
+__pycache__/
+venv
+
+# Run file
+data/
+log/
+checkpoint/
+runs/
+multirun/
+outputs/
+pred/
+mlruns/
+scripts/
