@@ -1,9 +1,14 @@
-# GLORY
+# ✨GLORY: Global Graph-Enhanced Personalized News Recommendations
 Code for our paper [_Going Beyond Local: Global Graph-Enhanced Personalized News Recommendations_](https://arxiv.org/pdf/2307.06576.pdf) published at RecSys 2023. 
 
-![Glory Model Illustration](glory.jpg "Glory Model Illustration")
+<p align="center">
+  <img src="glory.jpg" alt="Glory Model Illustration" width="600" />
+  <br>
+  Glory Model Illustration
+</p>
 
-##### Enviroment
+
+### Environment
 > Python 3.8.10
 > pytorch 1.13.1+cu117
 ```shell
@@ -33,3 +38,16 @@ bash ../scripts/data_download.sh
 # Test
 python3 src/main.py model=GlobalLocal dataset=MINDsmall 
 ```
+
+### Bibliography
+
+```shell
+@misc{yang2023going,
+      title={Going Beyond Local: Global Graph-Enhanced Personalized News Recommendations}, 
+      author={Boming Yang and Dairui Liu and Toyotaro Suzumura and Ruihai Dong and Irene Li},
+      year={2023},
+      publisher ={RecSys},
+}
+```
+
+
