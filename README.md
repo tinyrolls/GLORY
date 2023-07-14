@@ -1,5 +1,7 @@
 # GLORY
-Code for GLORY
+Code for our paper [_Going Beyond Local: Global Graph-Enhanced Personalized News Recommendations_](https://arxiv.org/pdf/2307.06576.pdf) published at RecSys 2023. 
+
+![Glory Model Illustration](glory.jpg "Glory Model Illustration")
 
 ##### Enviroment
 > Python 3.8.10
