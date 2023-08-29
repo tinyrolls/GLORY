@@ -175,24 +175,6 @@ class TrainGraphDataset(TrainDataset):
                     f.seek(0)
 
 
-class ValidDataset(TrainDataset):
-    def __init__(self, filename, news_index, news_emb, local_rank, cfg):
-        super().__init__(filename, news_index, None, local_rank, cfg)
-        self.news_emb = news_emb
-
-    def line_mapper(self, line):
-        line = line.strip().split('\t')
-        clicked_id = line[3].split()
-        clicked_index, clicked_mask = self.pad_to_fix_len(self.trans_to_nindex(clicked_id), self.cfg.model.his_size)
-        clicked_emb = self.news_emb[clicked_index]
-
-        candidate_index = self.trans_to_nindex([i.split('-')[0] for i in line[4].split()])
-        labels = np.array([int(i.split('-')[1]) for i in line[4].split()])
-        candidate_emb = self.news_emb[candidate_index]
-
-        return clicked_emb, clicked_mask, candidate_emb, clicked_index, candidate_index, labels
-
-
 class ValidGraphDataset(TrainGraphDataset):
     def __init__(self, filename, news_index, news_input, local_rank, cfg, neighbor_dict, news_graph, entity_neighbors, news_entity):
         super().__init__(filename, news_index, news_input, local_rank, cfg, neighbor_dict, news_graph, entity_neighbors)
@@ -249,36 +231,6 @@ class ValidGraphDataset(TrainGraphDataset):
             if line.strip().split('\t')[3]:
                 batch, mapping_idx, clicked_entity, candidate_input, candidate_entity, entity_mask, labels = self.line_mapper(line)
             yield batch, mapping_idx, clicked_entity, candidate_input, candidate_entity, entity_mask, labels
-
-
-class TestGraphDataset(TrainGraphDataset):
-    def __init__(self, filename, news_index, news_input, local_rank, cfg, neighbor_dict, news_graph):
-        super().__init__(filename, news_index, news_input, local_rank, cfg, neighbor_dict, news_graph)
-        self.news_graph.x = torch.from_numpy(self.news_input).to(local_rank, non_blocking=True)
-    
-    def line_mapper(self, line):
-        line = line.strip().split('\t')
-        click_id = line[3].split()[-self.cfg.model.his_size:]
-
-        click_idx = self.trans_to_nindex(click_id)
-        total_idx = self.trans_to_nindex(click_id)
-
-        for news_idx in click_idx:
-            valid_len = min(len(self.neighbor_dict[news_idx]), self.cfg.model.num_neighbors)
-            total_idx.extend(self.neighbor_dict[news_idx][:valid_len])
-        
-        sub_news_graph, mapping_idx = self.build_subgraph(total_idx, len(click_id), 0)
-
-        batch = Batch.from_data_list([sub_news_graph])
-        candidate_index = self.trans_to_nindex([i for i in line[4].split()])
-        candidate_input = self.news_input[candidate_index]
-
-        return batch, mapping_idx, candidate_input
-    
-    def __iter__(self):
-        for line in open(self.filename):
-            sub_newsgraph, mappings, candidate_input = self.line_mapper(line)
-            yield sub_newsgraph, mappings, candidate_input
 
 
 class NewsDataset(Dataset):

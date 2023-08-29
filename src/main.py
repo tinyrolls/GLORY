@@ -17,6 +17,9 @@ from dataload.data_preprocess import prepare_preprocessed_data
 from utils.metrics import *
 from utils.common import *
 
+### custom your wandb setting here ###
+# os.environ["WANDB_API_KEY"] = ""
+os.environ["WANDB_MODE"] = "offline"
 
 def train(model, optimizer, scaler, scheduler, dataloader, local_rank, cfg, early_stopping):
     model.train()
@@ -158,7 +161,7 @@ def main_worker(local_rank, cfg):
 
     if local_rank == 0:
         wandb.init(config=OmegaConf.to_container(cfg, resolve=True),
-                   project=cfg.logger.exp_name, entity=cfg.logger.entity, name=cfg.logger.run_name)
+                   project=cfg.logger.exp_name, name=cfg.logger.run_name)
         print(model)
 
     # for _ in tqdm(range(1, cfg.num_epochs + 1), desc="Epoch"):

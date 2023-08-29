@@ -108,16 +108,6 @@ def load_data(cfg, mode='train', model=None, local_rank=0):
                     news_entity=news_input[:,-8:-3],
                     entity_neighbors=entity_neighbors
                 )
-            else:
-                dataset = TestGraphDataset(
-                    filename=Path(data_dir[mode]) / f"behaviors.tsv",
-                    news_index=news_index,
-                    news_input=news_emb,
-                    local_rank=local_rank,
-                    cfg=cfg,
-                    neighbor_dict=news_neighbors_dict,
-                    news_graph=news_graph
-                )
 
             dataloader = DataLoader(dataset, batch_size=None)
 
@@ -148,8 +138,6 @@ def load_data(cfg, mode='train', model=None, local_rank=0):
 
 
 def collate_fn(tuple_list, local_rank):
-    # clicked_news = torch.FloatTensor(np.array([x[0] for x in tuple_list])).to(local_rank, non_blocking=True)
-    # clicked_mask = torch.FloatTensor(np.array([x[1] for x in tuple_list])).to(local_rank, non_blocking=True)
     clicked_news = [x[0] for x in tuple_list]
     clicked_mask = [x[1] for x in tuple_list]
     candidate_news = [x[2] for x in tuple_list]

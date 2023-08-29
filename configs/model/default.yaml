@@ -16,7 +16,6 @@ head_num: 20
 head_dim: 20
 word_filter_num: 0
 
-use_abstract: false
 use_graph: false
 use_entity: false
 num_neighbors: 10

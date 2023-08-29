@@ -13,7 +13,6 @@ import torch.distributed as dist
 
 import importlib
 from omegaconf import DictConfig, ListConfig
-from transformers import BertModel
 
 
 def seed_everything(seed):

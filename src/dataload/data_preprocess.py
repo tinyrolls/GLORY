@@ -5,7 +5,6 @@ from nltk.tokenize import word_tokenize
 from torch_geometric.data import Data
 from torch_geometric.utils import to_undirected
 
-from transformers import BertTokenizer
 import torch.nn.functional as F
 from tqdm import tqdm
 import random
@@ -156,7 +155,6 @@ def read_raw_news(cfg, file_path, mode='train'):
             return news, news_dict, None, None, entity_dict, None
 
 
-
 def read_parsed_news(cfg, news, news_dict,
                      category_dict=None, subcategory_dict=None, entity_dict=None,
                      word_dict=None):
@@ -165,14 +163,9 @@ def read_parsed_news(cfg, news, news_dict,
     news_entity = np.zeros((news_num, 5), dtype='int32')
 
     news_title = np.zeros((news_num, cfg.model.title_size), dtype='int32')
-    if cfg.model.use_abstract:
-        news_abstract = np.zeros((news_num, cfg.model.abstract_size), dtype='int32')
 
     for _news_id in tqdm(news, total=len(news), desc="Processing parsed news"):
-        if cfg.model.use_abstract:
-            _title, _abstract, _category, _subcategory, _entity_ids, _news_index = news[_news_id]
-        else:
-            _title, _category, _subcategory, _entity_ids, _news_index = news[_news_id]
+        _title, _category, _subcategory, _entity_ids, _news_index = news[_news_id]
 
         news_category[_news_index, 0] = category_dict[_category] if _category in category_dict else 0
         news_subcategory[_news_index, 0] = subcategory_dict[_subcategory] if _subcategory in subcategory_dict else 0
@@ -186,7 +179,7 @@ def read_parsed_news(cfg, news, news_dict,
             if _title[_word_id] in word_dict:
                 news_title[_news_index, _word_id] = word_dict[_title[_word_id]]
 
-        return news_title, news_entity, news_category, news_subcategory, news_index
+    return news_title, news_entity, news_category, news_subcategory, news_index
 
 
 def prepare_preprocess_bin(cfg, mode):
@@ -226,13 +219,10 @@ def prepare_news_graph(cfg, mode='train'):
     data_dir = {"train": cfg.dataset.train_dir, "val": cfg.dataset.val_dir, "test": cfg.dataset.test_dir}
 
     nltk_target_path = Path(data_dir[mode]) / "nltk_news_graph.pt"
-    bert_target_path = Path(data_dir[mode]) / "bert_news_graph.pt"
-    # entity_target_path = Path(data_dir[mode]) / "entity_graph.pt"
 
     reprocess_flag = False
-    for file_path in [nltk_target_path, bert_target_path]:
-        if file_path.exists() is False:
-            reprocess_flag = True
+    if nltk_target_path.exists() is False:
+        reprocess_flag = True
         
     if (reprocess_flag == False) and (cfg.reprocess == False):
         print(f"[{mode}] All graphs exist !")
@@ -384,14 +374,16 @@ def prepare_entity_graph(cfg, mode='train'):
     if mode == 'train':
         target_news_graph_path = Path(data_dir[mode]) / "nltk_news_graph.pt"
         news_graph = torch.load(target_news_graph_path)
+        print("news_graph,", news_graph)
         entity_indices = news_graph.x[:, -8:-3].numpy()
+        print("entity_indices, ", entity_indices.shape)
 
         entity_edge_index = []
-        if cfg.test_flag1:
-            for entity_idx in entity_indices:
-                entity_idx = entity_idx[entity_idx > 0]
-                edges = list(itertools.combinations(entity_idx, r=2))
-                entity_edge_index.extend(edges)
+        # -------- Inter-news -----------------
+        # for entity_idx in entity_indices:
+        #     entity_idx = entity_idx[entity_idx > 0]
+        #     edges = list(itertools.combinations(entity_idx, r=2))
+        #     entity_edge_index.extend(edges)
 
         news_edge_src, news_edge_dest = news_graph.edge_index
         edge_weights = news_graph.edge_attr.long().tolist()
@@ -411,8 +403,8 @@ def prepare_entity_graph(cfg, mode='train'):
         edge_index = torch.tensor(list(zip(*unique_edges)), dtype=torch.long)
         edge_attr = torch.tensor([edge_weights[edge] for edge in unique_edges], dtype=torch.long)
 
-        if cfg.test_flag2:
-            edge_index, edge_attr = to_undirected(edge_index, edge_attr)
+        # --- Entity Graph Undirected
+        edge_index, edge_attr = to_undirected(edge_index, edge_attr)
 
         data = Data(x=torch.arange(len(entity_dict) + 1),
                     edge_index=edge_index,

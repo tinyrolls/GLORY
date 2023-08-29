@@ -11,8 +11,8 @@ from models.component.news_encoder import *
 from models.component.user_encoder import *
 
 
-class GlobalLocal(nn.Module):
-    def __init__(self, cfg, glove_emb=None, bert_model=None, entity_emb=None):
+class GLORY(nn.Module):
+    def __init__(self, cfg, glove_emb=None, entity_emb=None):
         super().__init__()
 
         self.cfg = cfg
@@ -23,7 +23,7 @@ class GlobalLocal(nn.Module):
 
         # -------------------------- Model --------------------------
         # News Encoder
-        self.local_news_encoder = NewsEncoder(cfg, glove_emb, bert_model)
+        self.local_news_encoder = NewsEncoder(cfg, glove_emb)
 
         # GCN
         self.global_news_encoder = Sequential('x, index', [

@@ -4,8 +4,8 @@
 # order of defaults determines the order in which configs override each other
 defaults:
   - default
-  - override dataset: MINDSmall
-  - override model: GlobalLocal
+  - override dataset: MINDsmall
+  - override model: GLORY
   - _self_
 
 optimizer:
@@ -14,11 +14,11 @@ optimizer:
 num_epochs: 5
 batch_size: 32            # dataloaders'batch_size = batch_size / gpu_num
 accumulation_steps: 1     # final acutal batch_size = batch_size * accumulation_steps
-gpu_num: 4
+gpu_num: 1
 
 # load or not
 load_checkpoint: false
-load_mark: null
+load_mark: base_small
 train_mode: true
 val_mode: true
 
@@ -34,10 +34,10 @@ model:
   
 
 logger:
-  exp_name: Final_Version
+  exp_name: GLORY
   run_name: ${model.model_name}_${dataset.dataset_name}_${model.k_hops}-${model.num_neighbors}-${model.entity_neighbors}
 
-ml_label: ${model.k_hops}-${model.num_neighbors}-${model.entity_neighbors}
+ml_label: default
 
 num_workers: 4
 early_stop_patience: 5
@@ -48,8 +48,3 @@ log_steps: 1000
 
 val_skip_epochs: 2
 val_steps: 1000
-
-
-
-test_flag1: false # for inter-news
-test_flag2: true # for entity undirected

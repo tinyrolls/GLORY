@@ -2,5 +2,5 @@ defaults:
   - default
   - _self_
 
-model_name : GlobalLocal
+model_name : GLORY
 use_graph: true

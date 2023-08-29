@@ -2,8 +2,8 @@ defaults:
   - _self_
   - default
 
-dataset_name: MINDSmall
-dataset_dir: ${path.data_dir}/MINDSmall
+dataset_name: MINDsmall
+dataset_dir: ${path.data_dir}/MINDsmall
 dataset_lang: english
 
 train_len: 156965

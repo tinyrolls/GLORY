@@ -4,8 +4,8 @@
 # order of defaults determines the order in which configs override each other
 defaults:
   - default
-  - override dataset: MINDLarge
-  - override model: GlobalLocal
+  - override dataset: MINDlarge
+  - override model: GLORY
   - _self_
 
 optimizer:
@@ -18,7 +18,7 @@ gpu_num: 4
 
 # load or not
 load_checkpoint: false
-load_mark: base_e4
+load_mark: base_large
 train_mode: true
 val_mode: true
 
@@ -33,10 +33,10 @@ model:
   k_hops: 2
 
 logger:
-  exp_name: Final_Version
-  run_name: ${model.k_hops}-${model.num_neighbors}-${model.entity_neighbors}
+  exp_name: GLORY
+  run_name: ${model.model_name}_${dataset.dataset_name}_${model.k_hops}-${model.num_neighbors}-${model.entity_neighbors}
 
-ml_label: base
+ml_label: default
 
 num_workers: 4
 early_stop_patience: 5
@@ -46,6 +46,3 @@ warmup_ratio: 0.1
 
 val_skip_epochs: 1
 val_steps: 10000
-
-test_flag1: false # for inter-news
-test_flag2: true # for entity undirected

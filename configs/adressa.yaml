@@ -5,7 +5,7 @@
 defaults:
   - default
   - override dataset: AdressaSmall
-  - override model: GlobalLocal
+  - override model: GLORY
   - _self_
 
 optimizer:
@@ -47,9 +47,3 @@ log_steps: 1000
 
 val_skip_epochs: 2
 val_steps: 1000
-
-
-graph_test_flag: 0
-
-test_flag1: false # for inter-news
-test_flag2: true # for entity undirected

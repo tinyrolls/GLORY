@@ -4,9 +4,9 @@
 # order of defaults determines the order in which configs override each other
 defaults:
   - path: default
-  - model: NRMS
+  - model: GLORY
   - logger: wandb
-  - dataset: MINDLarge
+  - dataset: MINDlarge
   - _self_
 
 seed: 3407 # 3407 is all you need

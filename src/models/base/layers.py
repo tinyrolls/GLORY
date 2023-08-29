@@ -4,7 +4,6 @@ import numpy as np
 import torch.nn as nn
 import torch.nn.functional as F
 from torch_geometric.nn import GCNConv
-from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from models.base.function import *
 
 
@@ -25,50 +24,6 @@ class DotProduct(nn.Module):
         """
         result = torch.bmm(left, right.unsqueeze(dim=-1)).squeeze(dim=-1)
         return result
-
-
-
-class AdditiveAttention(nn.Module):
-    """
-    Additive Attention
-    """
-
-    def __init__(self, key_size, query_size, hidden_size, dropout=0, **kwargs):
-        super().__init__()
-        self.W_k = nn.Linear(key_size, hidden_size, bias=False)
-        self.W_q = nn.Linear(query_size, hidden_size, bias=False)
-        self.W_v = nn.Linear(hidden_size, 1, bias=False)
-        self.dropout = nn.Dropout(dropout)
-
-    def forward(self, queries, keys, values, attn_mask):
-        """
-        Args:
-            queries: (batch_size, query_num, query_size)
-            keys: (batch_size, key_num, key_size)
-            values:  (batch_size, value_num, value_size)
-            attn_mask: (batch_size, news_num)
-        Return:
-            (shape): batch_size, value_num, dim_value
-
-        """
-        # queries: [batch_size, query_num, hidden_size]
-        # keys: [batch_size, key_num, hidden_size]
-        queries, keys = self.W_q(queries), self.W_k(keys)
-        # Broadcast Sum
-        # features: [batch_size, query_num, key_num, hidden_size]
-        features = queries.unsqueeze(2) + keys.unsqueeze(1)
-        features = torch.tanh(features)
-
-        # scores: (batch_size, query_num)
-        # scores: (batch_size, query_num, key_num)
-        scores = self.W_v(features).squeeze(-1)
-
-        alpha = torch.exp(scores)
-        alpha = alpha * attn_mask.unsqueeze(1)
-        alpha = alpha / (torch.sum(alpha, dim=-1, keepdim=True) + 1e-8)
-
-        target = torch.bmm(self.dropout(alpha), values)
-        return target
 
 
 class AttentionPooling(nn.Module):

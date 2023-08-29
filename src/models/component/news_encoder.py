@@ -16,9 +16,8 @@ from models.base.layers import *
 
 
 class NewsEncoder(nn.Module):
-    def __init__(self, cfg, glove_emb=None, bert_model=None):
+    def __init__(self, cfg, glove_emb=None):
         super().__init__()
-        self.use_abstract = cfg.model.use_abstract
         token_emb_dim = cfg.model.word_emb_dim
         self.news_dim = cfg.model.head_num * cfg.model.head_dim
 
@@ -62,21 +61,11 @@ class NewsEncoder(nn.Module):
         num_news = news_input.shape[1]
 
         # [batch_size * news_num, view_size, word_emb_dim]
-        if self.use_abstract:
-            # 30,50,1,1,1
-            title_input, abstract_input, _, _, _, _ = news_input.split([self.view_size[0],
-                                                                        self.view_size[1], 5, 1, 1, 1], dim=-1)
-            abstract_word_emb = self.word_encoder(abstract_input.long().view(-1, self.view_size[1]))
-        else:
-            # 30,1,1,1
-            title_input, _, _, _, _ = news_input.split([self.view_size[0], 5, 1, 1, 1], dim=-1)
+        title_input, _, _, _, _ = news_input.split([self.view_size[0], 5, 1, 1, 1], dim=-1)
 
         title_word_emb = self.word_encoder(title_input.long().view(-1, self.view_size[0]))
 
-        if self.use_abstract:
-            total_word_emb = torch.concat([title_word_emb, abstract_word_emb], dim=-2)
-        else:
-            total_word_emb = title_word_emb
+        total_word_emb = title_word_emb
 
         result = self.attention(total_word_emb, mask)
 
